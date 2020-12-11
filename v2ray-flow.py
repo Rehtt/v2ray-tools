@@ -35,6 +35,8 @@ def red(f):
 
 
 def help():
+    print("v2ray-flow.py [-h] [-g <tag>] [-c <file>] [-s <server>]")
+    print("默认显示全部用户\n")
     print("-h,--help\t显示帮助")
     print("-g <tag>\t显示组的流量")
     print("\t-g A\t\t(显示tag:A组的流量)\n")
