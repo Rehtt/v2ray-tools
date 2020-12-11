@@ -45,6 +45,8 @@ for tag in tags:
     for email in tags[tag]:
         i=0
         z=0
+        down=0
+        up=0
         for r in res:
             i+=1
             if email in r:
@@ -55,7 +57,6 @@ for tag in tags:
                     up=dataSize(float(re.sub('\D','',res[i])))
                 if z==2:
                     break
-        if z==2:
-            print('Email:',red(email),'\tTag:'+red(tag))
-            print('上传:',up,'\t下载:',down,'\n')
-            z=0
+        print('Email:',red(email),'\tTag:'+red(tag))
+        print('上传:',up,'\t下载:',down,'\n')
+        z=0
