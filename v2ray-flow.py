@@ -59,4 +59,3 @@ for tag in tags:
                     break
         print('Email:',red(email),'\tTag:'+red(tag))
         print('上传:',up,'\t下载:',down,'\n')
-        z=0
