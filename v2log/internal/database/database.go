@@ -55,13 +55,8 @@ func (EmailSheet) TableName() string {
 func FirstOrCreateEmail(db *gorm.DB, email string) (id uint) {
 	e := EmailSheetPool.Get().(*EmailSheet)
 	defer EmailSheetPool.Put(e)
-	db.Model(e).Where("email = ?", email).Pluck("id", &id)
-	if id != 0 {
-		return
-	}
 	e.Zero()
-	e.Email = email
-	db.Create(e)
+	db.Where("email = ?", email).FirstOrCreate(e)
 	return e.ID
 }
 
@@ -92,14 +87,8 @@ func (i *IpSheet) Zero() {
 func FirstOrCreateIp(db *gorm.DB, ip string) (id uint) {
 	e := IpSheetPool.Get().(*IpSheet)
 	defer IpSheetPool.Put(e)
-
-	db.Model(e).Where("ip = ?", ip).Pluck("id", &id)
-	if id != 0 {
-		return id
-	}
 	e.Zero()
-	e.Ip = ip
-	db.Create(e)
+	db.Where("ip = ?", ip).FirstOrCreate(e)
 	return e.ID
 }
 
@@ -131,14 +120,8 @@ func (u *UrlSheet) Zero() {
 func FirstOrCreateUrl(db *gorm.DB, url, port string) (id uint) {
 	e := UrlSheetPool.Get().(*UrlSheet)
 	defer UrlSheetPool.Put(e)
-	db.Where("url = ? AND port = ?", url, port).Pluck("id", &id)
-	if id != 0 {
-		return
-	}
 	e.Zero()
-	e.Url = url
-	e.Port = port
-	db.Create(e)
+	db.Where("url = ? AND port = ?", url, port).FirstOrCreate(e)
 	return e.ID
 }
 
