@@ -3,9 +3,13 @@ package internal
 import (
 	"bufio"
 	"github.com/Rehtt/v2ray-tools/v2log/internal/database"
+	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
 	"gorm.io/gorm"
 	"io"
 	"log"
+	"net"
+	"net/http"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -81,19 +85,69 @@ func Followup() {
 
 		var ips []*database.IpSheet
 		database.DB.Where("nation IS NULL").Find(&ips)
+		var ok bool
+		var nation, region, province, city, isp string
 		for i := range ips {
-			// todo
-			break
-			database.DB.Model(ips[i]).Updates(ips[i])
+			nation, region, province, city, isp, ok = GetIpAddr(ips[i].Ip)
+			ips[i].Nation = &nation
+			ips[i].Region = &region
+			ips[i].Province = &province
+			ips[i].City = &city
+			ips[i].ISP = &isp
+			if ok {
+				database.DB.Model(ips[i]).Updates(ips[i])
+			}
 		}
 
 		var urls []*database.UrlSheet
 		database.DB.Where("type IS NULL").Find(&urls)
 		for i := range urls {
-			// todo
 			break
+			nation, _, _, _, _, ok = GetIpAddr(ips[i].Ip)
+			urls[i].Nation = &nation
 			database.DB.Model(urls[i]).Updates(urls[i])
 		}
 		return nil
 	})
+}
+
+func GetIpAddr(ipStr string) (nation, region, province, city, isp string, ok bool) {
+	// 国家|区域|省份|城市|ISP
+	var dbPath = "ip2region.xdb"
+	if _, err := os.Stat(dbPath); err != nil {
+		resp, err := http.Get("https://github.com/lionsoul2014/ip2region/raw/master/data/ip2region.xdb")
+		if err != nil {
+			log.Println("下载ip2region.xdb失败：", err.Error())
+		}
+		defer resp.Body.Close()
+		f, _ := os.Create(dbPath)
+		f.ReadFrom(resp.Body)
+		defer f.Close()
+	}
+	searcher, _ := xdb.NewWithFileOnly(dbPath)
+	defer searcher.Close()
+
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		i, err := net.ResolveIPAddr("ip", ipStr)
+		if err != nil {
+			log.Println("找不到ip：", ipStr)
+		}
+		ip = i.IP
+	}
+
+	data, err := searcher.SearchByStr(ip.To16().String())
+	if err != nil {
+		log.Println("找不到ip记录：", ipStr, err.Error())
+		return
+	}
+	s := strings.Split(data, "|")
+
+	nation = s[0]
+	region = s[1]
+	province = s[2]
+	city = s[3]
+	isp = s[4]
+	ok = true
+	return
 }

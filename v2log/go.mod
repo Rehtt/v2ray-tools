@@ -3,6 +3,7 @@ module github.com/Rehtt/v2ray-tools/v2log
 go 1.19
 
 require (
+	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20220907060842-b2ba5d58e48d
 	gorm.io/driver/sqlite v1.3.6
 	gorm.io/gorm v1.23.10
 )

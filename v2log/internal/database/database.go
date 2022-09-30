@@ -62,10 +62,10 @@ type IpSheet struct {
 	CreatedAt time.Time `json:"created_at"`
 	Ip        string    `json:"ip" gorm:"uniqueIndex"`
 	Nation    *string   `json:"nation" gorm:"index"`
+	Region    *string   `json:"region"`
 	Province  *string   `json:"province"`
 	City      *string   `json:"city"`
-	Region    *string   `json:"region"`
-	Street    *string   `json:"street"`
+	ISP       *string   `json:"isp"`
 }
 
 func (IpSheet) TableName() string {
