@@ -56,7 +56,7 @@ func main() {
 			r.EmailId = database.FirstOrCreateEmail(tx, info.Email)
 			r.IpId = database.FirstOrCreateIp(tx, info.Ip)
 			r.UrlId = database.FirstOrCreateUrl(tx, info.Target, info.Port)
-			fmt.Println(database.SaveRecord(tx, r))
+			fmt.Println(database.SaveRecord(tx, r), info.Time.Format("2006/01/02-15:04:05"), info.Email, info.Target)
 			return nil
 		})
 	})
