@@ -66,7 +66,7 @@ func Split(str string) (info *Info, success bool) {
 		return
 	}
 	ip := strings.Split(s[2], ":")
-	info.Ip = ip[:len(ip)-1]
+	info.Ip = strings.Join(ip[:len(ip)-1],":")
 	u := strings.Split(s[4], ":")
 	info.Target = u[1]
 	info.Port = u[2]
