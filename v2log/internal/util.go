@@ -65,7 +65,8 @@ func Split(str string) (info *Info, success bool) {
 	if err != nil {
 		return
 	}
-	info.Ip = strings.Split(s[2], ":")[0]
+	ip := strings.Split(s[2], ":")
+	info.Ip = ip[:len(ip)-1]
 	u := strings.Split(s[4], ":")
 	info.Target = u[1]
 	info.Port = u[2]
@@ -133,6 +134,7 @@ func GetIpAddr(ipStr string) (nation, region, province, city, isp string, ok boo
 		i, err := net.ResolveIPAddr("ip", ipStr)
 		if err != nil {
 			log.Println("找不到ip：", ipStr)
+			return
 		}
 		ip = i.IP
 	}
