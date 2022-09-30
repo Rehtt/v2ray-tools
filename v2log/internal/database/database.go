@@ -42,15 +42,23 @@ type EmailSheet struct {
 	User      *string   `json:"user" gorm:"index"`
 }
 
+func (e *EmailSheet) Zero() {
+	e.ID = 0
+	e.CreatedAt = time.Now()
+	e.Email = ""
+	e.User = nil
+}
+
 func (EmailSheet) TableName() string {
 	return "email_sheet"
 }
 func FirstOrCreateEmail(db *gorm.DB, email string) (id uint) {
 	e := EmailSheetPool.Get().(*EmailSheet)
 	defer EmailSheetPool.Put(e)
-	db.Where("email = ?", email).Find(e)
-	if e.ID != 0 {
-		return e.ID
+	defer e.Zero()
+	db.Model(e).Where("email = ?", email).Pluck("id", &id)
+	if id != 0 {
+		return
 	}
 	e.Email = email
 	db.Create(e)
@@ -71,12 +79,24 @@ type IpSheet struct {
 func (IpSheet) TableName() string {
 	return "ip_sheet"
 }
+func (i *IpSheet) Zero() {
+	i.ID = 0
+	i.CreatedAt = time.Now()
+	i.Ip = ""
+	i.Nation = nil
+	i.Region = nil
+	i.Province = nil
+	i.City = nil
+	i.ISP = nil
+}
 func FirstOrCreateIp(db *gorm.DB, ip string) (id uint) {
 	e := IpSheetPool.Get().(*IpSheet)
 	defer IpSheetPool.Put(e)
-	db.Where("ip = ?", ip).Find(e)
-	if e.ID != 0 {
-		return e.ID
+	defer e.Zero()
+
+	db.Model(e).Where("ip = ?", ip).Pluck("id", &id)
+	if id != 0 {
+		return id
 	}
 	e.Ip = ip
 	db.Create(e)
@@ -97,13 +117,24 @@ type UrlSheet struct {
 func (UrlSheet) TableName() string {
 	return "url_sheet"
 }
+func (u *UrlSheet) Zero() {
+	u.ID = 0
+	u.CreatedAt = time.Now()
+	u.Url = ""
+	u.Port = ""
+	u.Type = nil
+	u.Company = nil
+	u.Nation = nil
+	u.NSFW = nil
+}
 
 func FirstOrCreateUrl(db *gorm.DB, url, port string) (id uint) {
 	e := UrlSheetPool.Get().(*UrlSheet)
 	defer UrlSheetPool.Put(e)
-	db.Where("url = ? AND port = ?", url, port).Find(e)
-	if e.ID != 0 {
-		return e.ID
+	defer e.Zero()
+	db.Where("url = ? AND port = ?", url, port).Pluck("id", &id)
+	if id != 0 {
+		return
 	}
 	e.Url = url
 	e.Port = port

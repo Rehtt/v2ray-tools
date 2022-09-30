@@ -54,6 +54,7 @@ var (
 
 func Split(str string) (info *Info, success bool) {
 	info = InfoPool.Get().(*Info)
+	// 2022/09/30 17:52:56 112.103.143.64:0 accepted tcp:grpc.biliapi.net:443 email: qm@ws.com
 	// 2022/09/29 11:36:22 113.89.232.233:0 accepted tcp:play.google.com:443 email: rehtt@vless.com
 	var err error
 	s := strings.Split(str, " ")
