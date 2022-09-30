@@ -17,17 +17,23 @@ var (
 )
 
 func init() {
+	var waitDB sync.WaitGroup
+	waitDB.Add(1)
 	go func() {
+		var w sync.Once
 		for {
 			now := time.Now()
 			fileName := fmt.Sprintf("v2log_%d-%d.db", now.Year(), now.Month())
 			lock.Lock()
 			fmt.Println(database.InitDB(fileName))
 			lock.Unlock()
+			w.Do(func() {
+				waitDB.Done()
+			})
 			time.Sleep(time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.Local).AddDate(0, 1, 0).Sub(now))
-
 		}
 	}()
+	waitDB.Wait()
 }
 func main() {
 	flag.Parse()
