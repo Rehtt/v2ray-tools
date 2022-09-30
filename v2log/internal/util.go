@@ -54,8 +54,9 @@ var (
 
 func Split(str string) (info *Info, success bool) {
 	info = InfoPool.Get().(*Info)
-	// 2022/09/30 17:52:56 112.103.143.64:0 accepted tcp:grpc.biliapi.net:443 email: qm@ws.com
-	// 2022/09/29 11:36:22 113.89.232.233:0 accepted tcp:play.google.com:443 email: rehtt@vless.com
+	// 2022/09/30 17:52:56 12.103.143.64:0 accepted tcp:grpc.biliapi.net:443 email: qm@ws.com
+	// 2022/09/29 11:36:22 13.89.232.233:0 accepted tcp:play.google.com:443 email: rehtt@vless.com
+	// 2022/09/30 23:02:54 tcp:1.155.158.187:0 accepted tcp:edge.microsoft.com:443 email: rehtt@vless.com
 	var err error
 	s := strings.Split(str, " ")
 	if len(s) != 7 {
@@ -66,7 +67,12 @@ func Split(str string) (info *Info, success bool) {
 		return
 	}
 	ip := strings.Split(s[2], ":")
-	info.Ip = strings.Join(ip[:len(ip)-1],":")
+	if ip[0]=="tcp"{
+		info.Ip = strings.Join(ip[1:len(ip)-1],":")
+	}else{
+		info.Ip = strings.Join(ip[:len(ip)-1],":")
+	}
+	
 	u := strings.Split(s[4], ":")
 	info.Target = u[1]
 	info.Port = u[2]
