@@ -38,25 +38,30 @@ func InitDB(dbFile string) (err error) {
 type EmailSheet struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	CreatedAt time.Time `json:"created_at"`
-	Email     string    `json:"email"`
-	User      *string   `json:"user"`
+	Email     string    `json:"email" gorm:"uniqueIndex"`
+	User      *string   `json:"user" gorm:"index"`
 }
 
 func (EmailSheet) TableName() string {
 	return "email_sheet"
 }
-func FirstOrCreateEmail(email string) (id uint) {
+func FirstOrCreateEmail(db *gorm.DB, email string) (id uint) {
 	e := EmailSheetPool.Get().(*EmailSheet)
 	defer EmailSheetPool.Put(e)
-	DB.Where(EmailSheet{Email: email}).FirstOrCreate(e)
+	db.Where("email = ?", email).Find(e)
+	if e.ID != 0 {
+		return e.ID
+	}
+	e.Email = email
+	db.Create(e)
 	return e.ID
 }
 
 type IpSheet struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	CreatedAt time.Time `json:"created_at"`
-	Ip        string    `json:"ip"`
-	Nation    *string   `json:"nation"`
+	Ip        string    `json:"ip" gorm:"uniqueIndex"`
+	Nation    *string   `json:"nation" gorm:"index"`
 	Province  *string   `json:"province"`
 	City      *string   `json:"city"`
 	Region    *string   `json:"region"`
@@ -66,19 +71,24 @@ type IpSheet struct {
 func (IpSheet) TableName() string {
 	return "ip_sheet"
 }
-func FirstOrCreateIp(ip string) (id uint) {
+func FirstOrCreateIp(db *gorm.DB, ip string) (id uint) {
 	e := IpSheetPool.Get().(*IpSheet)
 	defer IpSheetPool.Put(e)
-	DB.Where(IpSheet{Ip: ip}).FirstOrCreate(e)
+	db.Where("ip = ?", ip).Find(e)
+	if e.ID != 0 {
+		return e.ID
+	}
+	e.Ip = ip
+	db.Create(e)
 	return e.ID
 }
 
 type UrlSheet struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	CreatedAt time.Time `json:"created_at"`
-	Url       string    `json:"url"`
-	Port      string    `json:"port" `
-	Type      *string   `json:"type"`
+	Url       string    `json:"url" gorm:"index:url_port"`
+	Port      string    `json:"port" gorm:"index:url_port"`
+	Type      *string   `json:"type" gorm:"index"`
 	Company   *string   `json:"company"`
 	Nation    *string   `json:"nation"`
 	NSFW      *bool     `json:"nsfw"`
@@ -88,34 +98,40 @@ func (UrlSheet) TableName() string {
 	return "url_sheet"
 }
 
-func FirstOrCreateUrl(url, port string) (id uint) {
+func FirstOrCreateUrl(db *gorm.DB, url, port string) (id uint) {
 	e := UrlSheetPool.Get().(*UrlSheet)
 	defer UrlSheetPool.Put(e)
-	DB.Where(UrlSheet{Url: url, Port: port}).FirstOrCreate(e)
+	db.Where("url = ? AND port = ?", url, port).Find(e)
+	if e.ID != 0 {
+		return e.ID
+	}
+	e.Url = url
+	e.Port = port
+	db.Create(e)
 	return e.ID
 }
 
 type RecordingSheet struct {
 	ID        uint        `gorm:"primarykey" json:"id"`
 	VisitDate time.Time   `json:"visit_date"`
-	EmailId   uint        `json:"email_id"`
+	EmailId   uint        `json:"email_id" gorm:"index"`
 	Email     *EmailSheet `json:"email" gorm:"-"`
-	IpId      uint        `json:"ip_id"`
+	IpId      uint        `json:"ip_id" gorm:"index"`
 	IP        *IpSheet    `json:"ip" gorm:"-"`
-	UrlId     uint        `json:"url_id"`
+	UrlId     uint        `json:"url_id" gorm:"index"`
 	Url       *UrlSheet   `json:"url" gorm:"-"`
 }
 
 func (RecordingSheet) TableName() string {
 	return "recording_sheet"
 }
-func SaveRecord(sheet *RecordingSheet) (id uint) {
+func SaveRecord(db *gorm.DB, sheet *RecordingSheet) (id uint) {
 	defer RecordingSheetPool.Put(sheet)
-	DB.Create(sheet)
+	db.Create(sheet)
 	return sheet.ID
 }
 func NewRecordSheet() (s *RecordingSheet) {
 	s = RecordingSheetPool.Get().(*RecordingSheet)
 	s.ID = 0
-	return s
+	return
 }

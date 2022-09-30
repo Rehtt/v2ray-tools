@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Rehtt/v2ray-tools/v2log/internal"
 	"github.com/Rehtt/v2ray-tools/v2log/internal/database"
+	"gorm.io/gorm"
 	"sync"
 	"time"
 )
@@ -19,10 +20,12 @@ func init() {
 	go func() {
 		for {
 			now := time.Now()
+			fileName := fmt.Sprintf("v2log_%d-%d.db", now.Year(), now.Month())
 			lock.Lock()
-			database.InitDB(fmt.Sprintf("v2log_%d-%s.db", now.Year(), now.Month()))
+			fmt.Println(database.InitDB(fileName))
 			lock.Unlock()
-			time.Sleep(time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, time.Local).Sub(now))
+			time.Sleep(time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.Local).AddDate(0, 1, 0).Sub(now))
+
 		}
 	}()
 }
@@ -40,22 +43,26 @@ func main() {
 			return
 		}
 		defer internal.InfoPool.Put(info)
-		r := database.NewRecordSheet()
-		r.VisitDate = info.Time
-		r.EmailId = database.FirstOrCreateEmail(info.Email)
-		r.IpId = database.FirstOrCreateIp(info.Ip)
-		r.UrlId = database.FirstOrCreateUrl(info.Target, info.Port)
-		database.SaveRecord(r)
+		// 使用事务
+		database.DB.Transaction(func(tx *gorm.DB) error {
+			r := database.NewRecordSheet()
+			r.VisitDate = info.Time
+			r.EmailId = database.FirstOrCreateEmail(tx, info.Email)
+			r.IpId = database.FirstOrCreateIp(tx, info.Ip)
+			r.UrlId = database.FirstOrCreateUrl(tx, info.Target, info.Port)
+			fmt.Println(database.SaveRecord(tx, r))
+			return nil
+		})
 	})
 
 	// 清理日志
-	t := time.NewTicker(time.Hour)
+	t := time.NewTicker(10 * time.Minute)
 	for {
-		internal.CleanFile(*filePath)
-
-		lock.Lock()
-		internal.Followup()
-		lock.Unlock()
+		if lock.TryLock() {
+			internal.CleanFile(*filePath)
+			internal.Followup()
+			lock.Unlock()
+		}
 		<-t.C
 	}
 }

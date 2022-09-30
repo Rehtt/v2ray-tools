@@ -55,7 +55,7 @@ func Split(str string) (info *Info, success bool) {
 	if len(s) != 7 {
 		return
 	}
-	info.Time, err = time.Parse("2006/01/02 15:04:05", strings.Join(s[:2], ""))
+	info.Time, err = time.Parse("2006/01/02 15:04:05", strings.Join(s[:2], " "))
 	if err != nil {
 		return
 	}
@@ -80,14 +80,14 @@ func Followup() {
 	var ips []*database.IpSheet
 	database.DB.Where("nation IS NULL").Find(&ips)
 	for i := range ips {
-
+		// todo
 		database.DB.Model(ips[i]).Updates(ips[i])
 	}
 
 	var urls []*database.UrlSheet
-	database.DB.Where("type IS NULL").Find(&ips)
+	database.DB.Where("type IS NULL").Find(&urls)
 	for i := range urls {
-
+		// todo
 		database.DB.Model(urls[i]).Updates(urls[i])
 	}
 }
