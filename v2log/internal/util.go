@@ -3,6 +3,7 @@ package internal
 import (
 	"bufio"
 	"github.com/Rehtt/v2ray-tools/v2log/internal/database"
+	"gorm.io/gorm"
 	"io"
 	"log"
 	"os/exec"
@@ -70,24 +71,29 @@ func Split(str string) (info *Info, success bool) {
 
 // 完善数据库
 func Followup() {
-	var emails []*database.EmailSheet
-	database.DB.Where("user IS NULL").Find(&emails)
-	for i := range emails {
-		emails[i].User = &strings.Split(emails[i].Email, "@")[0]
-		database.DB.Model(emails[i]).Updates(emails[i])
-	}
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		var emails []*database.EmailSheet
+		database.DB.Where("user IS NULL").Find(&emails)
+		for i := range emails {
+			emails[i].User = &strings.Split(emails[i].Email, "@")[0]
+			database.DB.Model(emails[i]).Updates(emails[i])
+		}
 
-	var ips []*database.IpSheet
-	database.DB.Where("nation IS NULL").Find(&ips)
-	for i := range ips {
-		// todo
-		database.DB.Model(ips[i]).Updates(ips[i])
-	}
+		var ips []*database.IpSheet
+		database.DB.Where("nation IS NULL").Find(&ips)
+		for i := range ips {
+			// todo
+			break
+			database.DB.Model(ips[i]).Updates(ips[i])
+		}
 
-	var urls []*database.UrlSheet
-	database.DB.Where("type IS NULL").Find(&urls)
-	for i := range urls {
-		// todo
-		database.DB.Model(urls[i]).Updates(urls[i])
-	}
+		var urls []*database.UrlSheet
+		database.DB.Where("type IS NULL").Find(&urls)
+		for i := range urls {
+			// todo
+			break
+			database.DB.Model(urls[i]).Updates(urls[i])
+		}
+		return nil
+	})
 }
