@@ -57,7 +57,7 @@ func FirstOrCreateEmail(db *gorm.DB, email string) (id uint) {
 	defer EmailSheetPool.Put(e)
 	e.Zero()
 	e.Email = email
-	db.Where("email = ?",email).FirstOrCreate(e)
+	db.Where("email = ?", email).FirstOrCreate(e)
 	return e.ID
 }
 
@@ -90,15 +90,15 @@ func FirstOrCreateIp(db *gorm.DB, ip string) (id uint) {
 	defer IpSheetPool.Put(e)
 	e.Zero()
 	e.Ip = ip
-	db.Where("ip = ?",ip).FirstOrCreate(e)
+	db.Where("ip = ?", ip).FirstOrCreate(e)
 	return e.ID
 }
 
 type UrlSheet struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	CreatedAt time.Time `json:"created_at"`
-	Url       string    `json:"url" gorm:"index:url_port"`
-	Port      string    `json:"port" gorm:"index:url_port"`
+	Url       string    `json:"url" gorm:"uniqueIndex:url_port"`
+	Port      string    `json:"port" gorm:"uniqueIndex:url_port"`
 	Type      *string   `json:"type" gorm:"index"`
 	Company   *string   `json:"company"`
 	Nation    *string   `json:"nation"`
@@ -125,7 +125,7 @@ func FirstOrCreateUrl(db *gorm.DB, url, port string) (id uint) {
 	e.Zero()
 	e.Url = url
 	e.Port = port
-	db.Where("url = ? AND port = ?",url,port).FirstOrCreate(e)
+	db.Where("url = ? AND port = ?", url, port).FirstOrCreate(e)
 	return e.ID
 }
 
