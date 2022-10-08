@@ -95,14 +95,15 @@ func FirstOrCreateIp(db *gorm.DB, ip string) (id uint) {
 }
 
 type UrlSheet struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	CreatedAt time.Time `json:"created_at"`
-	Url       string    `json:"url" gorm:"uniqueIndex:url_port"`
-	Port      string    `json:"port" gorm:"uniqueIndex:url_port"`
-	Type      *string   `json:"type" gorm:"index"`
-	Company   *string   `json:"company"`
-	Nation    *string   `json:"nation"`
-	NSFW      *bool     `json:"nsfw"`
+	ID               uint      `json:"id" gorm:"primaryKey"`
+	CreatedAt        time.Time `json:"created_at"`
+	Url              string    `json:"url" gorm:"uniqueIndex:url_port_tp"`
+	Port             string    `json:"port" gorm:"uniqueIndex:url_port_tp"`
+	TransferProtocol string    `json:"transfer_protocol" gorm:"uniqueIndex:url_port_tp"`
+	Type             *string   `json:"type" gorm:"index"`
+	Company          *string   `json:"company"`
+	Nation           *string   `json:"nation"`
+	NSFW             *bool     `json:"nsfw"`
 }
 
 func (UrlSheet) TableName() string {
@@ -113,19 +114,21 @@ func (u *UrlSheet) Zero() {
 	u.CreatedAt = time.Now()
 	u.Url = ""
 	u.Port = ""
+	u.TransferProtocol = ""
 	u.Type = nil
 	u.Company = nil
 	u.Nation = nil
 	u.NSFW = nil
 }
 
-func FirstOrCreateUrl(db *gorm.DB, url, port string) (id uint) {
+func FirstOrCreateUrl(db *gorm.DB, url, port, tp string) (id uint) {
 	e := UrlSheetPool.Get().(*UrlSheet)
 	defer UrlSheetPool.Put(e)
 	e.Zero()
 	e.Url = url
 	e.Port = port
-	db.Where("url = ? AND port = ?", url, port).FirstOrCreate(e)
+	e.TransferProtocol = tp
+	db.Where("url = ? AND port = ? AND transfer_protocol = ?", url, port, tp).FirstOrCreate(e)
 	return e.ID
 }
 

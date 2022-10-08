@@ -39,11 +39,12 @@ func CleanFile(filePath string) error {
 }
 
 type Info struct {
-	Time   time.Time
-	Ip     string
-	Target string
-	Port   string
-	Email  string
+	Time             time.Time
+	Ip               string
+	Target           string
+	Port             string
+	TransferProtocol string
+	Email            string
 }
 
 var (
@@ -67,13 +68,14 @@ func Split(str string) (info *Info, success bool) {
 		return
 	}
 	ip := strings.Split(s[2], ":")
-	if ip[0]=="tcp"{
-		info.Ip = strings.Join(ip[1:len(ip)-1],":")
-	}else{
-		info.Ip = strings.Join(ip[:len(ip)-1],":")
+	if ip[0] == "tcp" {
+		info.Ip = strings.Join(ip[1:len(ip)-1], ":")
+	} else {
+		info.Ip = strings.Join(ip[:len(ip)-1], ":")
 	}
-	
+
 	u := strings.Split(s[4], ":")
+	info.TransferProtocol = u[0]
 	info.Target = u[1]
 	info.Port = u[2]
 	info.Email = s[6]
