@@ -57,7 +57,7 @@ func main() {
 			return
 		}
 		defer internal.InfoPool.Put(info)
-		if !info.Time.After(last) {
+		if info.Time.Before(last) {
 			return
 		}
 		// 使用事务
