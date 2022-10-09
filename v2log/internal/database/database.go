@@ -36,15 +36,13 @@ func InitDB(dbFile string) (err error) {
 }
 
 type EmailSheet struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	CreatedAt time.Time `json:"created_at"`
-	Email     string    `json:"email" gorm:"uniqueIndex"`
-	User      *string   `json:"user" gorm:"index"`
+	ID    uint    `json:"id" gorm:"primaryKey"`
+	Email string  `json:"email" gorm:"uniqueIndex"`
+	User  *string `json:"user" gorm:"index"`
 }
 
 func (e *EmailSheet) Zero() {
 	e.ID = 0
-	e.CreatedAt = time.Now()
 	e.Email = ""
 	e.User = nil
 }
@@ -62,14 +60,13 @@ func FirstOrCreateEmail(db *gorm.DB, email string) (id uint) {
 }
 
 type IpSheet struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	CreatedAt time.Time `json:"created_at"`
-	Ip        string    `json:"ip" gorm:"uniqueIndex"`
-	Nation    *string   `json:"nation" gorm:"index"`
-	Region    *string   `json:"region"`
-	Province  *string   `json:"province"`
-	City      *string   `json:"city"`
-	ISP       *string   `json:"isp"`
+	ID       uint    `json:"id" gorm:"primaryKey"`
+	Ip       string  `json:"ip" gorm:"uniqueIndex"`
+	Nation   *string `json:"nation" gorm:"index"`
+	Region   *string `json:"region"`
+	Province *string `json:"province"`
+	City     *string `json:"city"`
+	ISP      *string `json:"isp"`
 }
 
 func (IpSheet) TableName() string {
@@ -77,7 +74,6 @@ func (IpSheet) TableName() string {
 }
 func (i *IpSheet) Zero() {
 	i.ID = 0
-	i.CreatedAt = time.Now()
 	i.Ip = ""
 	i.Nation = nil
 	i.Region = nil
@@ -95,15 +91,14 @@ func FirstOrCreateIp(db *gorm.DB, ip string) (id uint) {
 }
 
 type UrlSheet struct {
-	ID               uint      `json:"id" gorm:"primaryKey"`
-	CreatedAt        time.Time `json:"created_at"`
-	Url              string    `json:"url" gorm:"uniqueIndex:url_port_tp"`
-	Port             string    `json:"port" gorm:"uniqueIndex:url_port_tp"`
-	TransferProtocol string    `json:"transfer_protocol" gorm:"uniqueIndex:url_port_tp"`
-	Type             *string   `json:"type" gorm:"index"`
-	Company          *string   `json:"company"`
-	Nation           *string   `json:"nation"`
-	NSFW             *bool     `json:"nsfw"`
+	ID               uint    `json:"id" gorm:"primaryKey"`
+	Url              string  `json:"url" gorm:"uniqueIndex:url_port_tp"`
+	Port             string  `json:"port" gorm:"uniqueIndex:url_port_tp"`
+	TransferProtocol string  `json:"transfer_protocol" gorm:"uniqueIndex:url_port_tp"`
+	Type             *string `json:"type" gorm:"index"`
+	Company          *string `json:"company"`
+	Nation           *string `json:"nation"`
+	NSFW             *bool   `json:"nsfw"`
 }
 
 func (UrlSheet) TableName() string {
@@ -111,7 +106,6 @@ func (UrlSheet) TableName() string {
 }
 func (u *UrlSheet) Zero() {
 	u.ID = 0
-	u.CreatedAt = time.Now()
 	u.Url = ""
 	u.Port = ""
 	u.TransferProtocol = ""
