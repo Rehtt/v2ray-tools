@@ -63,7 +63,7 @@ func Split(str string) (info *Info, success bool) {
 	if len(s) != 7 {
 		return
 	}
-	info.Time, err = time.Parse("2006/01/02 15:04:05", strings.Join(s[:2], " "))
+	info.Time, err = time.ParseInLocation("2006/01/02 15:04:05", strings.Join(s[:2], " "), time.Local)
 	if err != nil {
 		return
 	}
