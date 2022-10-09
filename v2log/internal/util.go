@@ -17,7 +17,7 @@ import (
 )
 
 func Tail(filePath string, f func(text string)) {
-	c := exec.Command("tail", "-f", filePath)
+	c := exec.Command("tail", "-f", "-n", "+0", filePath)
 	stdout, err := c.StdoutPipe()
 	if err != nil {
 		log.Fatalln(err)
