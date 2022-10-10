@@ -127,13 +127,12 @@ func GetIpAddr(ipStr string) (nation, region, province, city, isp string, ok boo
 	// 国家|区域|省份|城市|ISP
 	var dbPath = "ip2region.xdb"
 
-	hash, err := util.GetGitBranchHash("https://github.com/lionsoul2014/ip2region.git", "refs/heads/master")
+	info, err := util.GetGitHubFileInfo("lionsoul2014", "ip2region", "data/ip2region.xdb")
 	if err != nil {
 		log.Println("get hash error:", err)
-		return
 	}
-	if GetHash("ip2region.xdb") != hash {
-		SetHash("ip2region.xdb", hash)
+	if GetHash("ip2region.xdb") != info.Sha {
+		SetHash("ip2region.xdb", info.Sha)
 		resp, err := http.Get("https://github.com/lionsoul2014/ip2region/raw/master/data/ip2region.xdb")
 		if err != nil {
 			log.Println("下载ip2region.xdb失败：", err.Error())
