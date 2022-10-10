@@ -2,6 +2,8 @@ package internal
 
 import (
 	"bufio"
+	"encoding/json"
+	"github.com/Rehtt/Kit/util"
 	"github.com/Rehtt/v2ray-tools/v2log/internal/database"
 	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
 	"gorm.io/gorm"
@@ -124,7 +126,14 @@ func Followup() {
 func GetIpAddr(ipStr string) (nation, region, province, city, isp string, ok bool) {
 	// 国家|区域|省份|城市|ISP
 	var dbPath = "ip2region.xdb"
-	if _, err := os.Stat(dbPath); err != nil {
+
+	hash, err := util.GetGitBranchHash("https://github.com/lionsoul2014/ip2region.git", "refs/heads/master")
+	if err != nil {
+		log.Println("get hash error:", err)
+		return
+	}
+	if GetHash("ip2region.xdb") != hash {
+		SetHash("ip2region.xdb", hash)
 		resp, err := http.Get("https://github.com/lionsoul2014/ip2region/raw/master/data/ip2region.xdb")
 		if err != nil {
 			log.Println("下载ip2region.xdb失败：", err.Error())
@@ -134,6 +143,7 @@ func GetIpAddr(ipStr string) (nation, region, province, city, isp string, ok boo
 		f.ReadFrom(resp.Body)
 		defer f.Close()
 	}
+
 	searcher, _ := xdb.NewWithFileOnly(dbPath)
 	defer searcher.Close()
 
@@ -161,4 +171,28 @@ func GetIpAddr(ipStr string) (nation, region, province, city, isp string, ok boo
 	isp = s[4]
 	ok = true
 	return
+}
+
+func GetHash(key string) string {
+	return openHashFile()[key]
+}
+func SetHash(key, value string) {
+	tmp := openHashFile()
+	tmp[key] = value
+	f, err := os.Create("hash")
+	if err != nil {
+		log.Println("save hash file error:", err)
+		return
+	}
+	defer f.Close()
+	json.NewEncoder(f).Encode(tmp)
+}
+func openHashFile() (out map[string]string) {
+	f, err := os.Open("hash")
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	json.NewDecoder(f).Decode(&out)
+	return out
 }
