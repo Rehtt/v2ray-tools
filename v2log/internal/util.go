@@ -131,9 +131,9 @@ func GetIpAddr(ipStr string) (nation, region, province, city, isp string, ok boo
 	if err != nil {
 		log.Println("get hash error:", err)
 	}
-	if GetHash("ip2region.xdb") != info.Sha {
-		SetHash("ip2region.xdb", info.Sha)
-		resp, err := http.Get("https://github.com/lionsoul2014/ip2region/raw/master/data/ip2region.xdb")
+	if GetHash(info.Name) != info.Sha {
+		SetHash(info.Name, info.Sha)
+		resp, err := http.Get(info.DownloadUrl)
 		if err != nil {
 			log.Println("下载ip2region.xdb失败：", err.Error())
 		}
