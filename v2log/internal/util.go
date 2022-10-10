@@ -187,6 +187,7 @@ func SetHash(key, value string) {
 	json.NewEncoder(f).Encode(tmp)
 }
 func openHashFile() (out map[string]string) {
+	out = make(map[string]string)
 	f, err := os.Open("hash")
 	if err != nil {
 		return
