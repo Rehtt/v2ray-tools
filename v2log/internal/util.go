@@ -175,12 +175,20 @@ func GetIpAddr(ipStr string) (nation, region, province, city, isp string, ok boo
 	return
 }
 
+type hash struct {
+	Hash string `json:"hash"`
+	Time string `json:"time"`
+}
+
 func GetHash(key string) string {
-	return openHashFile()[key]
+	return openHashFile()[key].Hash
 }
 func SetHash(key, value string) {
 	tmp := openHashFile()
-	tmp[key] = value
+	tmp[key] = hash{
+		Hash: value,
+		Time: time.Now().Format("2006-01-02"),
+	}
 	f, err := os.Create("hash")
 	if err != nil {
 		log.Println("save hash file error:", err)
@@ -189,8 +197,8 @@ func SetHash(key, value string) {
 	defer f.Close()
 	json.NewEncoder(f).Encode(tmp)
 }
-func openHashFile() (out map[string]string) {
-	out = make(map[string]string)
+func openHashFile() (out map[string]hash) {
+	out = make(map[string]hash)
 	f, err := os.Open("hash")
 	if err != nil {
 		return
