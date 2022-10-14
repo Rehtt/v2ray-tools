@@ -124,6 +124,9 @@ func Followup() {
 }
 
 func GetIpAddr(ipStr string) (nation, region, province, city, isp string, ok bool) {
+	if ipStr[0] == '[' {
+		return
+	}
 	// 国家|区域|省份|城市|ISP
 	var dbPath = "ip2region.xdb"
 
