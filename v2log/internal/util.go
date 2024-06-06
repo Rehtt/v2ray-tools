@@ -3,10 +3,6 @@ package internal
 import (
 	"bufio"
 	"encoding/json"
-	"github.com/Rehtt/Kit/util"
-	"github.com/Rehtt/v2ray-tools/v2log/internal/database"
-	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
-	"gorm.io/gorm"
 	"io"
 	"log"
 	"net"
@@ -16,6 +12,11 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/Rehtt/Kit/util"
+	"github.com/Rehtt/v2ray-tools/v2log/internal/database"
+	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
+	"gorm.io/gorm"
 )
 
 func Tail(filePath string, f func(text string)) {
@@ -80,7 +81,12 @@ func Split(str string) (info *Info, success bool) {
 	info.TransferProtocol = u[0]
 	info.Target = u[1]
 	info.Port = u[2]
-	info.Email = s[6]
+	for i, v := range s {
+		if v == "email:" {
+			info.Email = s[i+1]
+			break
+		}
+	}
 	success = true
 	return
 }
