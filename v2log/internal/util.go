@@ -78,7 +78,7 @@ func Split(str string) (info *Info, success bool) {
 	}
 
 	u := strings.Split(s[4], ":")
-	if len(u) != 2 {
+	if len(u) != 3 {
 		return
 	}
 	info.TransferProtocol = u[0]
