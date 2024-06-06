@@ -78,6 +78,9 @@ func Split(str string) (info *Info, success bool) {
 	}
 
 	u := strings.Split(s[4], ":")
+	if len(u) != 2 {
+		return
+	}
 	info.TransferProtocol = u[0]
 	info.Target = u[1]
 	info.Port = u[2]
@@ -86,6 +89,9 @@ func Split(str string) (info *Info, success bool) {
 			info.Email = s[i+1]
 			break
 		}
+	}
+	if info.Email == "" {
+		return
 	}
 	success = true
 	return
