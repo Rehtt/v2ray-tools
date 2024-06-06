@@ -63,7 +63,7 @@ func Split(str string) (info *Info, success bool) {
 	// 2022/09/30 23:02:54 tcp:1.155.158.187:0 accepted tcp:edge.microsoft.com:443 email: rehtt@vless.com
 	var err error
 	s := strings.Split(str, " ")
-	if len(s) != 7 {
+	if len(s) < 7 {
 		return
 	}
 	info.Time, err = time.ParseInLocation("2006/01/02 15:04:05", strings.Join(s[:2], " "), time.Local)
